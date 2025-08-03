@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__context7__get-library-docs",
+      "Bash(mv:*)",
+      "Bash(dir)",
+      "Bash(pnpm:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)",
+      "Bash(true)"
+    ],
+    "deny": []
+  }
+}

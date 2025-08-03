@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Montserrat:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Dark mode as default - Phase 0 colors */
+    --background: 18 18 18; /* #121212 */
+    --foreground: 255 195 0; /* #FFC300 Gold text */
+    --card: 30 30 30; /* #1E1E1E */
+    --card-foreground: 255 195 0;
+    --popover: 30 30 30;
+    --popover-foreground: 255 195 0;
+    --primary: 255 195 0; /* #FFC300 */
+    --primary-foreground: 18 18 18;
+    --secondary: 255 215 0; /* #FFD700 */
+    --secondary-foreground: 18 18 18;
+    --muted: 38 38 38;
+    --muted-foreground: 163 163 163;
+    --accent: 38 38 38;
+    --accent-foreground: 255 195 0;
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 250 252;
+    --border: 38 38 38;
+    --input: 38 38 38;
+    --ring: 255 195 0;
+    --radius: 0.5rem;
+  }
+
+  .light {
+    --background: 255 255 255;
+    --foreground: 10 10 10;
+    --card: 255 255 255;
+    --card-foreground: 10 10 10;
+    --popover: 255 255 255;
+    --popover-foreground: 10 10 10;
+    --primary: 255 215 0;
+    --primary-foreground: 255 255 255;
+    --secondary: 245 245 245;
+    --secondary-foreground: 10 10 10;
+    --muted: 245 245 245;
+    --muted-foreground: 107 114 126;
+    --accent: 245 245 245;
+    --accent-foreground: 10 10 10;
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 250 252;
+    --border: 229 231 235;
+    --input: 229 231 235;
+    --ring: 59 130 246;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    @apply dark; /* Default to dark mode */
+  }
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffc300;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffd700;
+}
