@@ -7,8 +7,8 @@ import { ContactInquiryEmail } from '@/components/emails/ContactInquiryEmail'
 import { AutoResponseEmail } from '@/components/emails/AutoResponseEmail'
 import { headers } from 'next/headers'
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Initialize Resend conditionally
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Request validation schema
 const contactFormSchema = z.object({
@@ -151,7 +151,10 @@ export async function POST(request: NextRequest) {
 
     // Send notification email to me
     try {
-      await resend.emails.send({
+      if (!resend) {
+        console.warn('Resend not configured - skipping notification email')
+      } else {
+        await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || 'portfolio@albertnartey.com',
         to: [process.env.CONTACT_EMAIL || 'albert@albertnartey.com'],
         subject: `[${referenceId}] ${config.subject}`,
@@ -172,7 +175,8 @@ export async function POST(request: NextRequest) {
           'X-Priority': config.priority === 'high' ? '1' : '3',
           'X-Entity-Ref-ID': referenceId
         }
-      })
+        })
+      }
     } catch (emailError) {
       console.error('Failed to send notification email:', emailError)
       // Don't fail the request if notification email fails
@@ -180,7 +184,10 @@ export async function POST(request: NextRequest) {
 
     // Send auto-response email to user
     try {
-      await resend.emails.send({
+      if (!resend) {
+        console.warn('Resend not configured - skipping auto-response email')
+      } else {
+        await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || 'portfolio@albertnartey.com',
         to: [formData.email],
         subject: `Thank you for reaching out! (Ref: ${referenceId})`,
@@ -193,7 +200,8 @@ export async function POST(request: NextRequest) {
         headers: {
           'X-Entity-Ref-ID': referenceId
         }
-      })
+        })
+      }
     } catch (emailError) {
       console.error('Failed to send auto-response email:', emailError)
       // Don't fail the request if auto-response fails

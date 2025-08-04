@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
@@ -21,11 +21,8 @@ declare global {
   }
 }
 
-interface AnalyticsProviderProps {
-  children: React.ReactNode
-}
-
-export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
+// Component that handles page tracking with useSearchParams
+function PageTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { trackPageView } = useAnalytics()
@@ -67,6 +64,14 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     }
   }, [pathname, searchParams, trackPageView])
 
+  return null
+}
+
+interface AnalyticsProviderProps {
+  children: React.ReactNode
+}
+
+export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   return (
     <>
       {/* Google Analytics */}
@@ -91,6 +96,11 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
           </Script>
         </>
       )}
+
+      {/* Page tracking wrapped in Suspense boundary */}
+      <Suspense fallback={null}>
+        <PageTracker />
+      </Suspense>
 
       {/* Vercel Analytics */}
       <Analytics />
