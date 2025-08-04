@@ -140,27 +140,28 @@ export default function AboutPage() {
         {/* Hero Section with Profile */}
         <motion.section
           variants={fadeInUp}
-          className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12"
+          className="grid items-center gap-8 lg:grid-cols-3 lg:gap-12"
         >
-          <div className="order-2 space-y-6 lg:order-1">
+          <div className="order-2 space-y-6 lg:order-1 lg:col-span-1">
             <motion.div
-              className="relative mx-auto h-72 w-72 overflow-hidden rounded-2xl shadow-2xl sm:h-80 sm:w-80 lg:mx-0"
+              className="relative mx-auto w-64 overflow-hidden rounded-2xl shadow-2xl sm:w-72 lg:mx-0 lg:w-80"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
               <Image
                 src="/assets/images/profile.jpg"
                 alt="Albert Nartey - Software Architect"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 280px, 320px"
+                width={320}
+                height={400}
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 640px) 256px, (max-width: 1024px) 288px, 320px"
                 priority
               />
               <div className="from-primary/20 absolute inset-0 bg-gradient-to-t to-transparent" />
             </motion.div>
           </div>
 
-          <div className="order-1 space-y-6 lg:order-2">
+          <div className="order-1 space-y-6 lg:order-2 lg:col-span-2">
             <h2 className="text-foreground text-center text-2xl font-bold sm:text-3xl lg:text-left lg:text-4xl">
               My Journey in Tech
             </h2>
