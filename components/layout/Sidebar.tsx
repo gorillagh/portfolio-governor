@@ -114,10 +114,10 @@ export function Sidebar({ className }: SidebarProps) {
 
                 {/* Profile Info */}
                 <div className="space-y-2">
-                  <h2 className="font-heading text-foreground text-lg font-semibold">
+                  <h2 className="font-heading text-xl font-semibold text-white">
                     {PROFILE_INFO.name}
                   </h2>
-                  <p className="text-primary text-sm font-medium">
+                  <p className="text-sm font-medium text-white">
                     {PROFILE_INFO.title}
                   </p>
                   {/* <p className="text-muted-foreground text-xs leading-relaxed">
