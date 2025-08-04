@@ -4,10 +4,15 @@ import { http, HttpResponse } from 'msw'
 export const handlers = [
   // Contact form submission
   http.post('/api/contact', async ({ request }) => {
-    const body = await request.json()
+    const body = await request.json() as {
+      name?: string
+      email?: string
+      message?: string
+      honeypot?: string
+    }
     
     // Simulate validation
-    if (!body.name || !body.email || !body.message) {
+    if (!body?.name || !body?.email || !body?.message) {
       return HttpResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -15,7 +20,7 @@ export const handlers = [
     }
     
     // Simulate spam detection
-    if (body.honeypot) {
+    if (body?.honeypot) {
       return HttpResponse.json(
         { error: 'Spam detected' },
         { status: 400 }

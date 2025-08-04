@@ -79,13 +79,13 @@ export function useFeaturedProjects() {
 }
 
 export function useProjectsByCategory(category?: string) {
-  const { data: allProjects, loading, error } = useProjects()
+  const { data: allProjects, loading, error, refetch } = useProjects()
   
   const projectsByCategory = category && category !== 'All' 
     ? allProjects?.filter(project => project.category === category) || []
     : allProjects || []
   
-  return { data: projectsByCategory, loading, error }
+  return { data: projectsByCategory, loading, error, refetch }
 }
 
 export function useProject(id: string) {
@@ -244,7 +244,7 @@ export function useProjectsAPI(category?: string, featured?: boolean) {
 }
 
 export function useProjectAPI(id: string, incrementViews = false) {
-  const headers = incrementViews ? { 'X-Increment-Views': 'true' } : {}
+  const headers: Record<string, string> = incrementViews ? { 'X-Increment-Views': 'true' } : {}
   
   const { data, error, mutate, isLoading } = useSWR(
     id ? `/api/projects/${id}` : null,

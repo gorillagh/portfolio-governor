@@ -54,7 +54,7 @@ export function SkillProgressBar({
           transition={{ 
             duration: 1.2, 
             delay: (delay + 300) / 1000,
-            ease: "easeOut"
+            
           }}
         />
       </div>

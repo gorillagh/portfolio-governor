@@ -38,7 +38,7 @@ export function TimelineItem({
       transition: {
         duration: 0.6,
         delay: index * 0.15, // Faster stagger for mobile
-        ease: "easeOut"
+        
       }
     }
   }

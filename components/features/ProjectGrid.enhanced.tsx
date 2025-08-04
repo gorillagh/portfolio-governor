@@ -114,7 +114,8 @@ export function EnhancedProjectGrid({
   // Track interactions
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category)
-    trackEvent('filter_projects', 'engagement', {
+    trackEvent('filter_projects', {
+      event_category: 'engagement',
       filter_type: 'category',
       filter_value: category
     })
@@ -122,7 +123,8 @@ export function EnhancedProjectGrid({
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    trackEvent('search_projects', 'engagement', {
+    trackEvent('search_projects', {
+      event_category: 'engagement',
       search_query: query,
       results_count: filteredAndSortedProjects.length
     })
@@ -130,14 +132,16 @@ export function EnhancedProjectGrid({
 
   const handleSortChange = (sort: SortOption) => {
     setSortBy(sort)
-    trackEvent('sort_projects', 'engagement', {
+    trackEvent('sort_projects', {
+      event_category: 'engagement',
       sort_type: sort
     })
   }
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode)
-    trackEvent('change_view_mode', 'engagement', {
+    trackEvent('change_view_mode', {
+      event_category: 'engagement',
       view_mode: mode
     })
   }

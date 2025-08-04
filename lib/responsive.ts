@@ -124,7 +124,7 @@ export function monitorLayoutShifts(): void {
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
-        console.log('Layout shift detected:', entry.value)
+        console.log('Layout shift detected:', (entry as any).value)
       }
     }
   })

@@ -96,7 +96,7 @@ export function EnhancedProjectCard({
       y: 0,
       transition: { 
         duration: 0.5,
-        ease: "easeOut"
+        
       }
     },
     hover: {
@@ -104,7 +104,7 @@ export function EnhancedProjectCard({
       scale: 1.02,
       transition: {
         duration: 0.3,
-        ease: "easeInOut"
+        ease: "easeInOut" as const
       }
     }
   }
@@ -114,7 +114,7 @@ export function EnhancedProjectCard({
       scale: 1.1,
       transition: {
         duration: 0.3,
-        ease: "easeInOut"
+        ease: "easeInOut" as const
       }
     }
   }

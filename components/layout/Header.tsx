@@ -68,7 +68,7 @@ export function Header({ title, breadcrumbs, className }: HeaderProps) {
     <motion.header
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.3, ease: "easeOut" as const }}
       className={cn(
         'bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-30 backdrop-blur',
         'border-border border-b',

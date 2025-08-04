@@ -159,7 +159,7 @@ export class FirebaseCollection<T extends DocumentData> {
       ...data,
       createdAt: now,
       updatedAt: now
-    } as T
+    } as unknown as T
 
     const docRef = await addDoc(this.collectionRef, docData)
     return docRef.id
@@ -171,7 +171,7 @@ export class FirebaseCollection<T extends DocumentData> {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    } as T))
+    } as unknown as T))
   }
 
   // Get document by ID
@@ -183,7 +183,7 @@ export class FirebaseCollection<T extends DocumentData> {
       return {
         id: docSnap.id,
         ...docSnap.data()
-      } as T
+      } as unknown as T
     }
     
     return null
@@ -237,7 +237,7 @@ export class FirebaseCollection<T extends DocumentData> {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    } as T))
+    } as unknown as T))
   }
 
   // Real-time listener
@@ -251,7 +251,7 @@ export class FirebaseCollection<T extends DocumentData> {
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        } as T))
+        } as unknown as T))
         callback(data)
       },
       errorCallback
@@ -293,7 +293,7 @@ export class FirebaseCollection<T extends DocumentData> {
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        } as T))
+        } as unknown as T))
         callback(data)
       },
       errorCallback

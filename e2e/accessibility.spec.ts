@@ -15,7 +15,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToHome()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           // Configure rules for WCAG 2.1 AA
           'color-contrast': { enabled: true },
@@ -37,7 +37,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToAbout()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'heading-order': { enabled: true },
@@ -54,7 +54,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToProjects()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'image-alt': { enabled: true },
@@ -71,7 +71,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToSkills()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'heading-order': { enabled: true },
@@ -86,7 +86,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToContact()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'form-field-multiple-labels': { enabled: true },
@@ -352,7 +352,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToHome()
       
       // Use axe to check color contrast
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true }
         }
@@ -365,7 +365,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToHome()
       
       // Check for elements that might rely on color alone
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'link-in-text-block': { enabled: true }
@@ -382,7 +382,7 @@ test.describe('Accessibility Tests', () => {
       await helpers.navigateToHome()
       await helpers.waitForPageLoad()
       
-      const violations = await getViolations(page, null, {
+      const violations = await getViolations(page, undefined, {
         rules: {
           'color-contrast': { enabled: true },
           'tap-target-size': { enabled: true },

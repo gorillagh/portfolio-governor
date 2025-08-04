@@ -128,7 +128,7 @@ export const SIDEBAR_MOTION_CONFIG: SidebarMotionConfig = {
     animate: { opacity: 1, y: 0 },
     transition: {
       duration: 0.3,
-      ease: 'easeOut'
+      ease: "easeOut" as const
     }
   }
 }

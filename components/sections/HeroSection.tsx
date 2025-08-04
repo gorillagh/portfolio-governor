@@ -26,7 +26,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: 'easeOut',
+      ease: "easeOut" as const,
     },
   },
 };
@@ -38,14 +38,14 @@ const buttonVariants = {
     scale: 1,
     transition: {
       duration: 0.5,
-      ease: 'easeOut',
+      ease: "easeOut" as const,
     },
   },
   hover: {
     scale: 1.05,
     transition: {
       duration: 0.2,
-      ease: 'easeInOut',
+      ease: "easeInOut" as const,
     },
   },
   tap: {
@@ -75,7 +75,7 @@ export function HeroSection() {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: "easeInOut" as const,
           }}
         />
         <motion.div
@@ -87,7 +87,7 @@ export function HeroSection() {
           transition={{
             duration: 10,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: "easeInOut" as const,
           }}
         />
       </div>
@@ -293,7 +293,7 @@ export function HeroSection() {
                 }}
                 transition={{
                   rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
-                  scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+                  scale: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
                 }}
               />
               <div className="border-primary/30 relative mx-auto h-64 w-64 overflow-hidden rounded-full border-4 shadow-2xl sm:h-80 sm:w-80 lg:h-96 lg:w-96">
@@ -316,7 +316,7 @@ export function HeroSection() {
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: 'easeInOut',
+                  ease: "easeInOut" as const,
                 }}
                 title="Available for new projects"
               />

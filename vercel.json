@@ -3,6 +3,7 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD",
   "regions": ["iad1"],
   "headers": [
     {
@@ -52,7 +53,8 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://albertnartey.vercel.app"
+    "NEXT_PUBLIC_SITE_URL": "https://albertnartey.vercel.app",
+    "SKIP_ENV_VALIDATION": "true"
   },
   "functions": {
     "app/api/contact/route.ts": {

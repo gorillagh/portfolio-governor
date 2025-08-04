@@ -45,7 +45,7 @@ export function ProjectCard({
       transition: {
         duration: 0.5,
         delay: index * 0.1,
-        ease: "easeOut"
+        
       }
     }
   }

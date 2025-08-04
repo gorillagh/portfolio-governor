@@ -6,7 +6,7 @@ import { z } from 'zod'
 const analyticsEventSchema = z.object({
   eventName: z.string().min(1).max(100),
   eventCategory: z.enum(['navigation', 'engagement', 'conversion', 'interaction']),
-  properties: z.record(z.any()).optional().default({}),
+  properties: z.record(z.string(), z.any()).optional().default({}),
   userId: z.string().optional()
 })
 

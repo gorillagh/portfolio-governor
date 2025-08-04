@@ -91,14 +91,15 @@ export default defineConfig({
 
   /* Test output directories */
   outputDir: 'test-results/',
-  testIdAttribute: 'data-testid',
 
   /* Expect configuration */
   expect: {
     // Maximum time expect() should wait for the condition to be met
     timeout: 10000,
-    // Threshold for screenshot comparisons
-    threshold: 0.2,
+    // Screenshot comparison configuration
+    toHaveScreenshot: {
+      threshold: 0.2,
+    },
   },
 
   /* Maximum time one test can run for */

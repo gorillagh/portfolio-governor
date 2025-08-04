@@ -1,6 +1,24 @@
 import { test, expect } from '@playwright/test'
 import { PortfolioPageHelpers } from './utils/test-helpers'
 
+interface LayoutShiftEntry extends PerformanceEntry {
+  hadRecentInput: boolean
+  value: number
+  sources?: Array<{
+    node?: Element
+    currentRect?: DOMRectReadOnly
+    previousRect?: DOMRectReadOnly
+  }>
+}
+
+interface WebVitals {
+  LCP: number
+  FID: number
+  CLS: number
+  FCP: number
+  TTFB: number
+}
+
 test.describe('Performance Tests', () => {
   let helpers: PortfolioPageHelpers
 
@@ -16,9 +34,9 @@ test.describe('Performance Tests', () => {
       await page.waitForLoadState('networkidle')
       
       // Measure Core Web Vitals
-      const vitals = await page.evaluate(() => {
+      const vitals = await page.evaluate((): Promise<WebVitals> => {
         return new Promise((resolve) => {
-          const vitals = {
+          const vitals: WebVitals = {
             LCP: 0,
             FID: 0,
             CLS: 0,
@@ -46,8 +64,9 @@ test.describe('Performance Tests', () => {
           let clsValue = 0
           new PerformanceObserver((entryList) => {
             for (const entry of entryList.getEntries()) {
-              if (!entry.hadRecentInput) {
-                clsValue += entry.value
+              const layoutShift = entry as LayoutShiftEntry
+              if (!layoutShift.hadRecentInput) {
+                clsValue += layoutShift.value
               }
             }
             vitals.CLS = clsValue
@@ -153,17 +172,26 @@ test.describe('Performance Tests', () => {
       await helpers.navigateToHome()
       
       // Measure layout shifts during font loading
-      const layoutShifts = await page.evaluate(() => {
+      const layoutShifts = await page.evaluate((): Promise<Array<{
+        value: number
+        hadRecentInput: boolean
+        sources?: Array<{ node?: string }>
+      }>> => {
         return new Promise((resolve) => {
-          const shifts = []
+          const shifts: Array<{
+            value: number
+            hadRecentInput: boolean
+            sources?: Array<{ node?: string }>
+          }> = []
           
           new PerformanceObserver((entryList) => {
             for (const entry of entryList.getEntries()) {
+              const layoutShift = entry as LayoutShiftEntry
               shifts.push({
-                value: entry.value,
-                hadRecentInput: entry.hadRecentInput,
-                sources: entry.sources?.map(source => ({
-                  node: source.node?.tagName,
+                value: layoutShift.value,
+                hadRecentInput: layoutShift.hadRecentInput,
+                sources: layoutShift.sources?.map(source => ({
+                  node: (source.node as Element)?.tagName,
                   currentRect: source.currentRect,
                   previousRect: source.previousRect
                 }))
@@ -211,9 +239,9 @@ test.describe('Performance Tests', () => {
         const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
         
         return {
-          domInteractive: navEntry.domInteractive - navEntry.navigationStart,
-          domComplete: navEntry.domComplete - navEntry.navigationStart,
-          loadEventEnd: navEntry.loadEventEnd - navEntry.navigationStart
+          domInteractive: navEntry.domInteractive - navEntry.fetchStart,
+          domComplete: navEntry.domComplete - navEntry.fetchStart,
+          loadEventEnd: navEntry.loadEventEnd - navEntry.fetchStart
         }
       })
       
@@ -357,14 +385,8 @@ test.describe('Performance Tests', () => {
 
   test.describe('Mobile Performance', () => {
     test('performs well on mobile device simulation', async ({ page }) => {
-      // Simulate mobile device
-      await page.emulate({
-        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15',
-        viewport: { width: 375, height: 667 },
-        deviceScaleFactor: 2,
-        isMobile: true,
-        hasTouch: true
-      })
+      // Simulate mobile device viewport
+      await page.setViewportSize({ width: 375, height: 667 })
       
       const startTime = Date.now()
       await helpers.navigateToHome()

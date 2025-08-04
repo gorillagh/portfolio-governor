@@ -111,7 +111,7 @@ const MockLayoutProvider = ({ children, initialState = {} }: { children: React.R
   const contextValue = defaultState
 
   return (
-    <LayoutProvider value={contextValue}>
+    <LayoutProvider>
       {children}
     </LayoutProvider>
   )

@@ -144,8 +144,6 @@ export async function POST(request: NextRequest) {
       budget: formData.budget,
       subject: formData.subject,
       message: formData.message,
-      priority: config.priority,
-      tags: [],
       ipAddress: clientIP,
       userAgent,
       referrer: referer

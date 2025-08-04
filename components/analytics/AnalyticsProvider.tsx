@@ -277,6 +277,7 @@ export function usePortfolioAnalytics() {
   }
 
   return {
+    trackEvent,
     trackProjectView,
     trackProjectLike,
     trackContactFormSubmit,

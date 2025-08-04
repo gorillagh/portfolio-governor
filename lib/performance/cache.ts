@@ -35,7 +35,9 @@ class MemoryCache {
     // Remove oldest entries if cache is full
     if (this.cache.size >= this.maxSize) {
       const oldestKey = this.cache.keys().next().value
-      this.cache.delete(oldestKey)
+      if (oldestKey !== undefined) {
+        this.cache.delete(oldestKey)
+      }
     }
 
     const expiry = Date.now() + (ttlSeconds * 1000)

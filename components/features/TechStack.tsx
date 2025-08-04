@@ -31,7 +31,7 @@ export function TechStack({ technologies, className = "" }: TechStackProps) {
       rotateY: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut"
+        
       }
     }
   }

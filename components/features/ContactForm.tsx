@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -69,7 +69,7 @@ export function ContactForm() {
   const inquiryType = watch('inquiryType')
 
   // Show budget field for consulting inquiries
-  useState(() => {
+  useEffect(() => {
     setShowBudgetField(inquiryType === 'consulting')
   }, [inquiryType])
 
@@ -111,7 +111,7 @@ export function ContactForm() {
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.6 }
     }
   }
 

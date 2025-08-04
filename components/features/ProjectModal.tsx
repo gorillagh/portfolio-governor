@@ -56,7 +56,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
       y: 0,
       transition: {
         duration: 0.4,
-        ease: "easeOut"
+        
       }
     },
     exit: {
@@ -65,7 +65,7 @@ export function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
       y: 50,
       transition: {
         duration: 0.3,
-        ease: "easeIn"
+        ease: "easeIn" as const
       }
     }
   }

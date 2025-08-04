@@ -39,10 +39,8 @@ if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_FIREBASE_MEASUREMEN
 // Connect to emulators in development
 if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
   try {
-    // Only connect if not already connected
-    if (!db._delegate._terminated) {
-      connectFirestoreEmulator(db, 'localhost', 8080)
-    }
+    // Connect to Firestore emulator
+    connectFirestoreEmulator(db, 'localhost', 8080)
   } catch (error) {
     // Emulator already connected or not available
     console.log('Firestore emulator connection:', error)
