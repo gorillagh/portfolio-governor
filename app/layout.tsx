@@ -1,9 +1,22 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/react'
+import { Ubuntu, Montserrat } from 'next/font/google'
+import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+// Font configurations matching the design system
+const ubuntu = Ubuntu({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
+  variable: '--font-ubuntu',
+  display: 'swap'
+})
+
+const montserrat = Montserrat({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  variable: '--font-montserrat',
+  display: 'swap'
+})
 
 export const metadata: Metadata = {
   title: {
@@ -59,9 +72,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
-        {children}
-        <Analytics />
+      <body className={`${ubuntu.variable} ${montserrat.variable} font-sans antialiased`}>
+        <AnalyticsProvider>
+          {children}
+        </AnalyticsProvider>
       </body>
     </html>
   )

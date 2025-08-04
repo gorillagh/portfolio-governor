@@ -1,158 +1,434 @@
-name: CI/CD Pipeline
+name: 'CI/CD Pipeline - Albert Nartey Portfolio'
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '18'
+  PNPM_VERSION: '8'
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  # Quality Gates - Code Quality and Linting
+  quality-gates:
+    name: 'Quality Gates'
     runs-on: ubuntu-latest
-    
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'TypeScript Type Check'
+        run: pnpm type-check
+
+      - name: 'ESLint Code Quality'
+        run: pnpm lint
+
+      - name: 'Prettier Code Formatting'
+        run: pnpm exec prettier --check .
+
+      - name: 'Build Application'
+        run: pnpm build
+
+      - name: 'Upload Build Artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: |
+            .next/
+            !.next/cache/
+          retention-days: 1
+
+  # Unit and Component Tests
+  unit-tests:
+    name: 'Unit & Component Tests'
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Run Unit Tests'
+        run: pnpm test --coverage --watchAll=false
+
+      - name: 'Upload Coverage Reports'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: 'Comment Coverage Report'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
+
+  # End-to-End Tests
+  e2e-tests:
+    name: 'E2E Tests'
+    runs-on: ubuntu-latest
+    needs: quality-gates
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
-    
+        browser: [chromium, firefox, webkit]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-        
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-      
-    - name: Run type checking
-      run: pnpm type-check
-      
-    - name: Run linting
-      run: pnpm lint
-      
-    - name: Build application
-      run: pnpm build
-      env:
-        NEXT_PUBLIC_SITE_URL: https://albertnartey.vercel.app
-        
-    - name: Run tests (if any)
-      run: |
-        if [ -f "package.json" ] && grep -q '"test"' package.json; then
-          pnpm test
-        else
-          echo "No tests found, skipping test step"
-        fi
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
 
-  security-audit:
-    name: Security Audit
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Install Playwright Browsers'
+        run: pnpm playwright install --with-deps ${{ matrix.browser }}
+
+      - name: 'Run E2E Tests'
+        run: pnpm playwright test --project=${{ matrix.browser }}
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: 'Upload E2E Test Results'
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: 'Upload E2E Test Traces'
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 30
+
+  # Accessibility Tests
+  accessibility-tests:
+    name: 'Accessibility Tests'
     runs-on: ubuntu-latest
-    
+    needs: quality-gates
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'pnpm'
-        
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-      
-    - name: Run security audit
-      run: pnpm audit --audit-level moderate
-      continue-on-error: true
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
 
-  lighthouse-ci:
-    name: Lighthouse CI
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Install Playwright Browsers'
+        run: pnpm playwright install --with-deps chromium
+
+      - name: 'Run Accessibility Tests'
+        run: pnpm playwright test e2e/accessibility.spec.ts
+
+      - name: 'Upload Accessibility Report'
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accessibility-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Performance Tests with Lighthouse CI
+  performance-tests:
+    name: 'Performance Tests'
     runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.event_name == 'pull_request'
-    
+    needs: quality-gates
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'pnpm'
-        
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-      
-    - name: Build for Lighthouse
-      run: pnpm build
-      env:
-        NEXT_PUBLIC_SITE_URL: https://albertnartey.vercel.app
-        
-    - name: Start server
-      run: pnpm start &
-      
-    - name: Wait for server
-      run: sleep 10
-      
-    - name: Run Lighthouse CI
-      run: |
-        npm install -g @lhci/cli@0.12.x
-        lhci autorun
-      env:
-        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
 
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Install Lighthouse CI'
+        run: npm install -g @lhci/cli@0.12.x
+
+      - name: 'Run Lighthouse CI'
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 'Run Performance E2E Tests'
+        run: pnpm playwright test e2e/performance.spec.ts
+
+      - name: 'Upload Performance Reports'
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-reports
+          path: |
+            .lighthouseci/
+            playwright-report/
+          retention-days: 30
+
+  # Security Scanning
+  security-scan:
+    name: 'Security Scan'
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Run Security Audit'
+        run: pnpm audit --audit-level moderate
+
+      - name: 'Run CodeQL Analysis'
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+
+      - name: 'Perform CodeQL Analysis'
+        uses: github/codeql-action/analyze@v2
+
+  # Bundle Analysis
+  bundle-analysis:
+    name: 'Bundle Analysis'
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup PNPM'
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: 'Install Dependencies'
+        run: pnpm install --frozen-lockfile
+
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Analyze Bundle Size'
+        run: |
+          npx next-bundle-analyzer
+        continue-on-error: true
+
+      - name: 'Bundle Size Check'
+        uses: andresz1/size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          package_manager: pnpm
+
+  # Deployment Preview (for PRs)
   deploy-preview:
-    name: Deploy Preview
+    name: 'Deploy Preview'
     runs-on: ubuntu-latest
-    needs: build-and-test
     if: github.event_name == 'pull_request'
-    
+    needs: [unit-tests, e2e-tests, accessibility-tests, performance-tests]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Vercel Preview
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.ORG_ID }}
-        vercel-project-id: ${{ secrets.PROJECT_ID }}
-        working-directory: ./
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
 
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Deploy to Vercel Preview'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+  # Production Deployment (main branch only)
   deploy-production:
-    name: Deploy Production
+    name: 'Deploy to Production'
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-audit]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+    needs: [unit-tests, e2e-tests, accessibility-tests, performance-tests, security-scan]
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.preview-url }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Vercel Production
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.ORG_ID }}
-        vercel-project-id: ${{ secrets.PROJECT_ID }}
-        vercel-args: '--prod'
-        working-directory: ./
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - name: 'Download Build Artifacts'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: .next/
+
+      - name: 'Deploy to Vercel Production'
+        id: deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: 'Post-Deployment Health Check'
+        run: |
+          sleep 30
+          curl -f ${{ steps.deploy.outputs.preview-url }} || exit 1
+
+      - name: 'Notify Deployment Success'
+        uses: 8398a7/action-slack@v3
+        if: success()
+        with:
+          status: success
+          text: '🚀 Portfolio successfully deployed to production!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Test Results Summary
+  test-summary:
+    name: 'Test Results Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [unit-tests, e2e-tests, accessibility-tests, performance-tests]
+    steps:
+      - name: 'Create Test Summary'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha
+            });
+            
+            const summary = checks.check_runs.reduce((acc, check) => {
+              acc[check.name] = check.conclusion;
+              return acc;
+            }, {});
+            
+            const passed = Object.values(summary).filter(s => s === 'success').length;
+            const total = Object.values(summary).length;
+            
+            core.summary
+              .addHeading('🧪 Test Results Summary')
+              .addTable([
+                [{data: 'Test Suite', header: true}, {data: 'Status', header: true}],
+                ['Unit & Component Tests', summary['Unit & Component Tests'] || 'pending'],
+                ['E2E Tests', summary['E2E Tests'] || 'pending'],
+                ['Accessibility Tests', summary['Accessibility Tests'] || 'pending'],
+                ['Performance Tests', summary['Performance Tests'] || 'pending']
+              ])
+              .addQuote(`${passed}/${total} test suites passed`)
+              .write();
+
+  # Cleanup
+  cleanup:
+    name: 'Cleanup Artifacts'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [deploy-production, deploy-preview]
+    steps:
+      - name: 'Delete Temporary Artifacts'
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: build-files
+          failOnError: false

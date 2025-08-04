@@ -9,7 +9,10 @@
       "Bash(npx create-next-app:*)",
       "Bash(pkill:*)",
       "Bash(taskkill:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "mcp__context7__resolve-library-id",
+      "Bash(npx playwright:*)",
+      "WebFetch(domain:tailwindcss.com)"
     ],
     "deny": []
   }
