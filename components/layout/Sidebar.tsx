@@ -93,7 +93,6 @@ export function Sidebar({ className }: SidebarProps) {
             className={cn(
               'bg-card border-border fixed top-0 left-0 z-40 h-screen w-80 border-r',
               'flex flex-col overflow-y-auto',
-              'lg:relative lg:z-auto',
               className
             )}
             role="navigation"
